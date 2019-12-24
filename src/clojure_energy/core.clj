@@ -73,21 +73,24 @@
    "Waardering"
    "Status"])
 
+(defn human-test [word]
+  (let [response (read-line)]
+    (= response "y")))
+
 (defn human-filter
-  ([in] (human-filter in [] []))
-  ([in keep discard]
+  ([test in] (human-filter test in [] []))
+  ([test in keep discard]
    (if (empty? in)
      {:keep keep :discard discard}
      (let [[first & rest] in]
        (println first)
-       (let [response (read-line)]
-           (if (= response "y")
-             (do
-               (println (str "Keeping \"" first "\""))
-               (recur rest (conj keep first) discard))
-             (do
-               (println (str "Discarding \"" first "\""))
-               (recur rest keep (conj discard first)))))))))
+       (if (test first)
+         (do
+           (println (str "Keeping \"" first "\""))
+           (recur test rest (conj keep first) discard))
+         (do
+           (println (str "Discarding \"" first "\""))
+           (recur test rest keep (conj discard first))))))))
 
 (defn human-at-most [x y]
   (println (str "Which do prefer, a) " x " or b) " y "?"))
@@ -115,7 +118,7 @@
   [& args]
   (println (str "You'll be presented with " (count words) " words."))
   (println "Press \"y\" to to keep a word and \"n\" to discard it.")
-  (let [{ keep :keep discard :discard } (human-filter (shuffle words))]
+  (let [{ keep :keep discard :discard } (human-filter human-test (shuffle words))]
     (println "Keeping:")
     (run! println-dash keep)
     (println "Discarding:")
