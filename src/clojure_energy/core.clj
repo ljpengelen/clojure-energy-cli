@@ -76,40 +76,23 @@
 (defn human-test [word]
   (println word)
   (let [response (read-line)]
-    (= response "y")))
-
-(defn human-filter
-  ([test in] (human-filter test in [] []))
-  ([test in keep discard]
-   (if (empty? in)
-     {:keep keep :discard discard}
-     (let [[first & rest] in]
-       (if (test first)
-         (do
-           (println (str "Keeping \"" first "\""))
-           (recur test rest (conj keep first) discard))
-         (do
-           (println (str "Discarding \"" first "\""))
-           (recur test rest keep (conj discard first))))))))
+    (if (= response "y")
+      (do
+        (println (str "Keeping \"" word "\""))
+        true)
+      (do
+        (println (str "Discarding \"" word "\""))
+        false))))
 
 (defn human-at-most [x y]
   (println (str "Which do prefer, a) " x " or b) " y "?"))
   (let [response (read-line)]
-    (= response "a")))
-
-(defn human-merge
-  [[l & *left :as left] [r & *right :as right] at-most acc]
-  (if (and (not-empty left) (not-empty right))
-    (if (at-most l r)
-      (do (println (str "Preferring \"" l "\"")) (recur *left right at-most (conj acc l)))
-      (do (println (str "Preferring \"" r "\"")) (recur left *right at-most (conj acc r))))
-    (concat acc left right)))
-
-(defn human-sort [at-most in]
-  (if (> (count in) 1)
-    (let [[left right] (split-at (/ (count in) 2) in)]
-      (human-merge (human-sort at-most left) (human-sort at-most right) at-most []))
-    in))
+    (if (= response "a")
+      (do
+        (println (str "Preferring \"" x "\""))
+        true)
+      (do (println (str "Preferring \"" y "\""))
+        false))))
 
 (defn println-dash [in] (println "-" in))
 
@@ -117,12 +100,12 @@
   [& args]
   (println "You'll be presented with" (count words) "words.")
   (println "Press \"y\" to to keep a word and \"n\" to discard it.")
-  (let [{ keep :keep discard :discard } (human-filter human-test (shuffle words))]
+  (let [{keep true discard false} (group-by human-test (shuffle words))]
     (println "Keeping:")
     (run! println-dash keep)
     (println "Discarding:")
     (run! println-dash discard)
-    (let [sorted-words (human-sort human-at-most keep)]
+    (let [sorted-words (sort human-at-most keep)]
       (println "Words in order:")
       (doseq [[i word] (map-indexed vector sorted-words)]
         (println (str " " (inc i) ": " word))))))
