@@ -74,6 +74,7 @@
    "Status"])
 
 (defn human-test [word]
+  (println word)
   (let [response (read-line)]
     (= response "y")))
 
@@ -83,7 +84,6 @@
    (if (empty? in)
      {:keep keep :discard discard}
      (let [[first & rest] in]
-       (println first)
        (if (test first)
          (do
            (println (str "Keeping \"" first "\""))
@@ -98,17 +98,17 @@
     (= response "a")))
 
 (defn human-merge
-  [[l & *left :as left] [r & *right :as right] acc]
+  [[l & *left :as left] [r & *right :as right] at-most acc]
   (if (and (not-empty left) (not-empty right))
-    (if (human-at-most l r)
-      (do (println (str "Preferring \"" l "\""))(recur *left right (conj acc l)))
-      (do (println (str "Preferring \"" r "\""))(recur left *right (conj acc r))))
+    (if (at-most l r)
+      (do (println (str "Preferring \"" l "\"")) (recur *left right at-most (conj acc l)))
+      (do (println (str "Preferring \"" r "\"")) (recur left *right at-most (conj acc r))))
     (concat acc left right)))
 
-(defn human-sort [in]
+(defn human-sort [at-most in]
   (if (> (count in) 1)
     (let [[left right] (split-at (/ (count in) 2) in)]
-      (human-merge (human-sort left) (human-sort right) []))
+      (human-merge (human-sort at-most left) (human-sort at-most right) at-most []))
     in))
 
 (defn println-dash [in] (println "-" in))
@@ -122,7 +122,7 @@
     (run! println-dash keep)
     (println "Discarding:")
     (run! println-dash discard)
-    (let [sorted-words (human-sort keep)]
+    (let [sorted-words (human-sort human-at-most keep)]
       (println "Words in order:")
       (doseq [[i word] (map-indexed vector sorted-words)]
         (println (str " " (inc i) ": " word))))))
