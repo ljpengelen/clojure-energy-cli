@@ -98,8 +98,8 @@
   [[l & *left :as left] [r & *right :as right] acc]
   (if (and (not-empty left) (not-empty right))
     (if (human-at-most l r)
-      (recur *left right (conj acc l))
-      (recur left *right (conj acc r)))
+      (do (println (str "Preferring \"" l "\""))(recur *left right (conj acc l)))
+      (do (println (str "Preferring \"" r "\""))(recur left *right (conj acc r))))
     (concat acc left right)))
 
 (defn human-sort [in]
