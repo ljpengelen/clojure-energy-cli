@@ -111,12 +111,11 @@
       (human-merge (human-sort left) (human-sort right) []))
     in))
 
-(defn println-dash
-  [in] (println (str " - " in)))
+(defn println-dash [in] (println "-" in))
 
 (defn -main
   [& args]
-  (println (str "You'll be presented with " (count words) " words."))
+  (println "You'll be presented with" (count words) "words.")
   (println "Press \"y\" to to keep a word and \"n\" to discard it.")
   (let [{ keep :keep discard :discard } (human-filter human-test (shuffle words))]
     (println "Keeping:")
