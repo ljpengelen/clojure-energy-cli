@@ -94,17 +94,13 @@
       (do (println (str "Preferring \"" y "\""))
         false))))
 
-(defn println-dash [in] (println "-" in))
-
 (defn -main
   [& args]
   (println "You'll be presented with" (count words) "words.")
   (println "Press \"y\" to to keep a word and \"n\" to discard it.")
   (let [{keep true discard false} (group-by human-test (shuffle words))]
-    (println "Keeping:")
-    (run! println-dash keep)
-    (println "Discarding:")
-    (run! println-dash discard)
+    (println "Keeping:" keep)
+    (println "Discarding:" discard)
     (let [sorted-words (sort human-at-most keep)]
       (println "Words in order:")
       (doseq [[i word] (map-indexed vector sorted-words)]
